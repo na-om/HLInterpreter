@@ -1,0 +1,2 @@
+ERROR
+(expected '<', '>', '==' or '!=' but found '=')

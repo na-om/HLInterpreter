@@ -1,0 +1,2 @@
+ERROR
+(double '1.234' has more than 2 decimal places)

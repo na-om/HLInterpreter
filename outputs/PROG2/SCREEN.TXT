@@ -1,0 +1,4 @@
+NO ERROR(S) FOUND
+
+--- Program output ---
+4.25

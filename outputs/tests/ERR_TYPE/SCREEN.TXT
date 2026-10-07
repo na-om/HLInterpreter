@@ -1,0 +1,2 @@
+ERROR
+(cannot assign a double value to integer variable 'x')

@@ -1,0 +1,2 @@
+ERROR
+(expected 'integer' or 'double' but found 'string')

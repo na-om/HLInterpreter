@@ -1,0 +1,5 @@
+NO ERROR(S) FOUND
+
+--- Program output ---
+hello world
+0.56

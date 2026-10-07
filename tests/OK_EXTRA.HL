@@ -1,0 +1,8 @@
+x: integer;
+x:= 6;
+If(x<5)
+   Output<<X;
+output<<"hello world";
+y: double;
+y = 4 + 2.56;
+output<<y - x;
