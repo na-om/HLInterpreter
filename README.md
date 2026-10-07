@@ -1,32 +1,16 @@
-\# HLInt
-
-
-
+# HLInt
 A simple interpreter for the hypothetical language HL, written in C.
 
-
-
-\## Build
-
+## Build
 Run `build.bat` (requires Visual Studio's C compiler).
 
+## Run
+HLInt PROG1.HL
 
+Writes NOSPACES.TXT and RES_SYM.TXT, then prints ERROR or NO ERROR(S) FOUND and runs the program.
 
-\## Run
-
-&#x20;   HLInt PROG1.HL
-
-
-
-Writes NOSPACES.TXT and RES\_SYM.TXT, then prints ERROR or NO ERROR(S) FOUND
-
-and runs the program.
-
-
-
-\## Optional web UI
-
-&#x20;   pip install streamlit
-
-&#x20;   streamlit run app.py
-
+## Optional web UI
+```bash
+pip install streamlit
+streamlit run app.py
+```
