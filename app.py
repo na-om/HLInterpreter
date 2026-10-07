@@ -1,8 +1,5 @@
-"""Streamlit UI for HLInt.
-
-Put this file in the same folder as HLInt.exe, then run:
-    streamlit run app.py
-"""
+import os
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -10,7 +7,6 @@ from pathlib import Path
 import streamlit as st
 
 HERE = Path(__file__).parent
-EXE = HERE / "HLInt.exe"          # the compiled interpreter
 
 SAMPLES = {
     "PROG1.HL": "x: integer;\nx:= 5;\noutput<<x;\n",
@@ -30,23 +26,34 @@ SAMPLES = {
 }
 
 
+@st.cache_resource
+def get_exe():
+    local = HERE / "HLInt.exe"
+    if os.name == "nt" and local.exists():
+        return local
+    cc = shutil.which("gcc") or shutil.which("cc")
+    if cc is None:
+        return None
+    out = Path(tempfile.gettempdir()) / ("HLInt.exe" if os.name == "nt" else "HLInt")
+    result = subprocess.run(
+        [cc, "-O2", "-o", str(out), str(HERE / "HLInt.c")],
+        capture_output=True, text=True,
+    )
+    return out if result.returncode == 0 else None
+
+
 def load_sample():
-    """Copy the chosen sample into the editor."""
     st.session_state.source = SAMPLES[st.session_state.sample]
 
 
-def run_hlint(source: str):
-    """Run HLInt.exe on `source` inside a temp folder.
-
-    HLInt writes NOSPACES.TXT and RES_SYM.TXT into its current directory,
-    so using a fresh temp folder keeps every run separate and tidy.
-    Returns (screen_output, nospaces_text, res_sym_text).
-    """
+def run_hlint(exe, source):
+    """Run HLInt on `source` in a temp folder (it writes its .TXT files to the cwd).
+    Returns (screen_output, nospaces_text, res_sym_text)."""
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         (tmp / "prog.HL").write_text(source, encoding="utf-8")
         result = subprocess.run(
-            [str(EXE), "prog.HL"],
+            [str(exe), "prog.HL"],
             cwd=tmp, capture_output=True, text=True, timeout=10,
         )
 
@@ -61,8 +68,9 @@ st.set_page_config(page_title="HLInt", page_icon="🖥️", layout="wide")
 st.title("HLInt: HL Interpreter")
 st.caption("Type an HL program, press Run, and see what HLInt does with it.")
 
-if not EXE.exists():
-    st.error(f"HLInt.exe not found next to app.py (looked in {HERE}). Build it first with build.bat.")
+exe = get_exe()
+if exe is None:
+    st.error("Could not find or build HLInt. Locally, run build.bat; on the cloud, check packages.txt.")
     st.stop()
 
 if "source" not in st.session_state:
@@ -78,7 +86,7 @@ with left:
 with right:
     if run:
         try:
-            screen, nospaces, res_sym = run_hlint(st.session_state.source)
+            screen, nospaces, res_sym = run_hlint(exe, st.session_state.source)
         except subprocess.TimeoutExpired:
             st.error("HLInt took too long and was stopped.")
             st.stop()
